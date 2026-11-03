@@ -12,7 +12,7 @@
 <body data-motion="on">
 <a class="skip" href="#main">跳至正文</a>
 <header class="header wrap">
-  <a class="brand" href="/" aria-label="Marshuo 博客首页"><span class="brand-mark">M<span>·</span></span><span class="brand-name">Marshuo<span>个人博客 / JOURNAL</span></span></a>
+  <a class="brand" href="/" aria-label="Marshuo 博客首页"><span class="brand-mark">M<span>·</span></span><span class="brand-name">Marshuo<span>技术博客</span></span></a>
   <nav aria-label="主导航">
     <a href="/" <%- is_home() ? 'aria-current="page"' : '' %>>文章</a>
     <a href="/#projects">项目</a>
@@ -22,7 +22,7 @@
   <div class="tools"><button id="search-open" aria-label="搜索文章" title="搜索文章"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><button id="theme-toggle" aria-label="切换深浅色" title="切换深浅色"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 15.5A9 9 0 0 1 8.5 4a9 9 0 1 0 11.5 11.5Z"/></svg></button></div>
 </header>
 <main id="main" class="wrap"><%- body %></main>
-<footer class="footer wrap"><div>© <%= new Date().getFullYear() %> Marshuo<span class="footer-note">保持好奇，持续记录。</span></div><a href="https://github.com/codeMarshuo" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/archives/">所有文章 ↗</a><span class="built">Built with Hexo & a little care.</span></footer>
+<footer class="footer wrap"><div>© <%= new Date().getFullYear() %> Marshuo</div><a href="https://github.com/codeMarshuo" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/archives/">所有文章 ↗</a></footer>
 <dialog id="search-dialog" aria-labelledby="search-title"><div class="search-head"><h2 id="search-title">搜索文章</h2><button id="search-close" aria-label="关闭搜索">✕</button></div><label for="search-input" class="sr-only">标题、标签或内容关键词</label><input id="search-input" type="search" placeholder="输入标题、标签或内容关键词…" autocomplete="off"><p id="search-status" role="status">从一个关键词开始。</p><div id="search-results"></div></dialog>
 <script src="/js/journal.js?v=<%= asset_version('js/journal.js') %>" defer></script>
 </body></html>
