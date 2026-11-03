@@ -1,6 +1,28 @@
 (() => {
   const toggle = document.querySelector('#theme-toggle');
   toggle.addEventListener('click', () => { const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = theme; try {localStorage.setItem('marshuo-theme', theme);} catch {} });
+
+  const motionButton = document.querySelector('#motion-toggle');
+  if (motionButton) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let paused = false;
+    try { paused = localStorage.getItem('marshuo-motion') === 'paused'; } catch {}
+    let inView = true;
+    const syncMotion = () => {
+      const off = paused || reduced.matches;
+      document.body.dataset.motion = off || document.hidden || !inView ? 'off' : 'on';
+      motionButton.setAttribute('aria-pressed', String(off));
+      motionButton.setAttribute('aria-label', reduced.matches ? '系统已启用减少动态效果' : off ? '播放背景动画' : '暂停背景动画');
+      motionButton.querySelector('.motion-label').textContent = reduced.matches ? '已减少动态' : off ? '播放动态' : '暂停动态';
+      motionButton.querySelector('.motion-icon').textContent = off ? '▷' : 'Ⅱ';
+      motionButton.disabled = reduced.matches;
+    };
+    motionButton.addEventListener('click', () => { paused = !paused; try {localStorage.setItem('marshuo-motion', paused ? 'paused' : 'on');} catch {} syncMotion(); });
+    document.addEventListener('visibilitychange', syncMotion);
+    reduced.addEventListener('change', syncMotion);
+    if ('IntersectionObserver' in window) new IntersectionObserver(entries => {inView = entries[0].isIntersecting;syncMotion();}, {threshold:0}).observe(document.querySelector('.twilight-hero'));
+    syncMotion();
+  }
   const dialog = document.querySelector('#search-dialog'), input = document.querySelector('#search-input'), results = document.querySelector('#search-results'), status = document.querySelector('#search-status');
   let articles;
   document.querySelector('#search-open').addEventListener('click', () => {dialog.showModal();input.focus();});
