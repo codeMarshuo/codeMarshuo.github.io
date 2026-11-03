@@ -1,5 +1,13 @@
 <div class="article-list">
-<% posts.forEach(function(post, i) { %>
-<article class="article-row"><div class="row-date"><time datetime="<%= date(post.date, 'YYYY-MM-DD') %>"><%= date(post.date, 'MM.DD') %></time><span><%= date(post.date, 'YYYY') %></span></div><div class="row-main"><div class="eyebrow"><%= post.categories.length ? post.categories.first().name : '随笔' %></div><h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2><p><%= truncate(strip_html((post.excerpt || post.content).replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')).replace(/\s+/g, ' '), {length: 105}) || '一篇学习记录，留给未来的自己。' %></p><div class="row-tags"><% post.tags.forEach(function(tag) { %><a href="<%= url_for(tag.path) %>"># <%= tag.name %></a><% }); %></div></div><a class="row-arrow" href="<%= url_for(post.path) %>" aria-label="阅读 <%= post.title %>">↗</a></article>
+<% posts.forEach(function(post) { %>
+  <article class="article-row">
+    <div class="row-main">
+      <div class="article-meta"><time datetime="<%= date(post.date,'YYYY-MM-DD') %>"><%= date(post.date,'YYYY.MM.DD') %></time><span aria-hidden="true">/</span><span><%= post.categories.length ? post.categories.first().name : '随笔' %></span></div>
+      <h2><a href="<%= url_for(post.path) %>"><%= post.title %></a></h2>
+      <p><%= truncate(strip_html((post.excerpt || post.content).replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')).replace(/\s+/g,' '), {length:100}) || '学习笔记。' %></p>
+      <div class="row-tags"><% post.tags.forEach(function(tag){ %><a href="<%= url_for(tag.path) %>"># <%= tag.name %></a><% }); %></div>
+    </div>
+    <a class="row-arrow" href="<%= url_for(post.path) %>" aria-label="阅读 <%= post.title %>">↗</a>
+  </article>
 <% }); %>
 </div>

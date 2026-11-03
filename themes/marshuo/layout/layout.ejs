@@ -4,12 +4,12 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title><%= page.title ? page.title + ' · ' : '' %>Marshuo's Blog</title>
   <meta name="description" content="<%= page.description || config.description %>">
-  <meta name="theme-color" content="#181323"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#151321"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="<%= page.permalink || config.url + '/' %>">
   <script>try{document.documentElement.dataset.theme=localStorage.getItem('marshuo-theme')||'dark'}catch(e){}</script>
   <link rel="stylesheet" href="/css/journal.css?v=<%= asset_version('css/journal.css') %>">
 </head>
-<body data-motion="on">
+<body class="<%= is_home() ? 'home-page' : 'inner-page' %>" data-motion="on">
 <a class="skip" href="#main">跳至正文</a>
 <header class="header wrap">
   <a class="brand" href="/" aria-label="Marshuo 博客首页"><span class="brand-mark">M<span>·</span></span><span class="brand-name">Marshuo<span>技术博客</span></span></a>
