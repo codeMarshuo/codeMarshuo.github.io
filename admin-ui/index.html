@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hexo 博客管理</title>
+  <link rel="stylesheet" href="/vditor/dist/index.css" />
+  <style>
+    :root {
+      --primary: #0078d4;
+      --primary-light: #e8f4fd;
+      --primary-dark: #005a9e;
+      --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #666;
+      --text-muted: #999;
+      --border: #e0e0e0;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --sidebar-width: 260px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ===== 侧边栏 ===== */
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .sidebar-header {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-header .logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sidebar-header .subtitle {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+    .nav-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.3);
+      padding: 16px 12px 6px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+      margin-bottom: 2px;
+      position: relative;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 0 3px 3px 0;
+    }
+    .nav-item .icon {
+      font-size: 16px;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .nav-item .badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.12);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .nav-item.active .badge {
+      background: rgba(96, 165, 250, 0.3);
+      color: #93c5fd;
+    }
+
+    .sidebar-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+    }
+    .sidebar-footer a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .sidebar-footer a:hover { color: #60a5fa; }
+
+    /* ===== 主内容区 ===== */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .top-bar {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      gap: 20px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .top-bar .page-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .top-bar .page-title .highlight {
+      color: var(--primary);
+    }
+    .top-bar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow: auto;
+      padding: 28px 32px;
+    }
+
+    /* ===== 按钮 ===== */
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,120,212,0.3); }
+    .btn-secondary {
+      background: #f0f0f0;
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: #e4e4e4; }
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success {
+      background: #10b981;
+      color: #fff;
+    }
+    .btn-success:hover { background: #059669; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 4px; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover { background: #f0f0f0; color: var(--text); }
+
+    /* ===== 文章列表 ===== */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .section-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .search-box {
+      position: relative;
+    }
+    .search-box input {
+      padding: 8px 14px 8px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      width: 240px;
+      outline: none;
+      transition: var(--transition);
+      background: var(--card-bg);
+    }
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.1);
+      width: 280px;
+    }
+    .search-box .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .post-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .post-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(0,120,212,0.2);
+    }
+    .post-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+    .post-card .meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .post-card .meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .post-card .excerpt {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex: 1;
+    }
+    .post-card .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .post-card .tag {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .post-card .card-actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: none;
+      gap: 4px;
+    }
+    .post-card:hover .card-actions { display: flex; }
+    .card-actions .btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 13px;
+      background: var(--card-bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+    }
+    .empty-state .empty-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state h3 {
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .empty-state p {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== 编辑器样式 ===== */
+    .editor-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 80px);
+    }
+    .editor-toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .editor-toolbar .filename-input {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 14px;
+      flex: 1;
+      min-width: 160px;
+      outline: none;
+      font-weight: 600;
+      transition: var(--transition);
+      background: var(--card-bg);
+    }
+    .editor-toolbar .filename-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.1);
+    }
+    .editor-toolbar .hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-right: 4px;
+    }
+
+    #vditor {
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ===== 文件管理器 ===== */
+    .file-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .file-filters .filter-btn {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--card-bg);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .file-filters .filter-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .file-filters .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .file-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      position: relative;
+      cursor: default;
+    }
+    .file-card:hover {
+      border-color: rgba(0,120,212,0.2);
+      box-shadow: var(--shadow-hover);
+    }
+    .file-card .file-icon {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .file-card .file-name {
+      font-size: 12px;
+      word-break: break-all;
+      line-height: 1.4;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .file-card .file-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .file-card .file-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: none;
+      gap: 4px;
+    }
+    .file-card:hover .file-actions { display: flex; }
+    .file-card .file-actions .btn {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .file-upload-area {
+      background: var(--card-bg);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 20px;
+    }
+    .file-upload-area:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .file-upload-area.dragover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: scale(1.01);
+    }
+    .file-upload-area .upload-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+    .file-upload-area h3 {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .file-upload-area p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ===== 模态框 ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+      padding: 28px 32px;
+      width: 90%;
+      max-width: 480px;
+      animation: scaleIn 0.25s ease;
+    }
+    .modal h2 { margin-bottom: 16px; font-size: 18px; }
+    .modal p { color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; font-size: 14px; }
+    .modal .form-group { margin-bottom: 16px; }
+    .modal .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-secondary);
+    }
+    .modal .form-group input,
+    .modal .form-group textarea,
+    .modal .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: var(--transition);
+      background: var(--card-bg);
+    }
+    .modal .form-group input:focus,
+    .modal .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.1);
+    }
+    .modal .form-group textarea { min-height: 80px; resize: vertical; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    /* ===== Toast ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 99999;
+    }
+    .toast {
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      margin-bottom: 8px;
+      animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 200px;
+    }
+    .toast.success { background: #10b981; }
+    .toast.error { background: #ef4444; }
+    .toast.info { background: var(--primary); }
+
+    /* ===== 构建输出 ===== */
+    .build-output {
+      background: #1e1e2e;
+      color: #a0e8a0;
+      padding: 20px;
+      border-radius: var(--radius-sm);
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      max-height: 400px;
+      overflow: auto;
+      white-space: pre-wrap;
+      display: none;
+      margin-top: 16px;
+    }
+    .build-output.show { display: block; }
+
+    /* ===== 动画 ===== */
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ===== 滚动条 ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0,0,0,0.25);
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 900px) {
+      .sidebar { width: 60px; }
+      .sidebar-header .logo, .sidebar-header .subtitle,
+      .nav-item span:not(.icon), .nav-item .badge,
+      .nav-section-label, .sidebar-footer { display: none; }
+      .sidebar-nav { padding: 12px 8px; }
+      .nav-item { padding: 11px; justify-content: center; }
+      .nav-item .icon { margin: 0; }
+      .nav-item.active::before { display: none; }
+      .nav-item.active { background: rgba(255,255,255,0.15); }
+      .top-bar { padding: 12px 16px; }
+      .content-area { padding: 16px; }
+      .post-grid { grid-template-columns: 1fr; }
+      .search-box input { width: 160px; }
+      .search-box input:focus { width: 180px; }
+    }
+
+    @media (max-width: 480px) {
+      .top-bar-actions .btn span { display: none; }
+      .editor-toolbar { flex-direction: column; }
+      .editor-toolbar .filename-input { width: 100%; }
+      .file-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 删除确认 -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <h2>确认删除</h2>
+      <p id="deleteMessage">确定要删除吗？此操作不可撤销。</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('deleteModal')">取消</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建文章对话框 -->
+  <div class="modal-overlay" id="newPostModal">
+    <div class="modal">
+      <h2>新建文章</h2>
+      <div class="form-group">
+        <label>标题</label>
+        <input type="text" id="newPostTitle" placeholder="输入文章标题" autofocus />
+      </div>
+      <div class="form-group">
+        <label>标签 (逗号分隔)</label>
+        <input type="text" id="newPostTags" placeholder="例如: JavaScript, Hexo, 教程" />
+      </div>
+      <div class="form-group">
+        <label>分类</label>
+        <input type="text" id="newPostCategories" placeholder="例如: 技术" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('newPostModal')">取消</button>
+        <button class="btn btn-primary" onclick="createNewPost()">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">MyBlog</div>
+        <div class="subtitle">Hexo 博客管理后台</div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section-label">内容</div>
+        <div class="nav-item active" onclick="switchPage('posts-page', this)">
+          <span class="icon">📄</span>
+          <span>文章管理</span>
+          <span class="badge" id="postCount">0</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('editor-page', this)">
+          <span class="icon">✏️</span>
+          <span>写文章</span>
+        </div>
+        <div class="nav-section-label">管理</div>
+        <div class="nav-item" onclick="switchPage('files-page', this)">
+          <span class="icon">📁</span>
+          <span>文件管理</span>
+          <span class="badge" id="fileCount">0</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('build-page', this)">
+          <span class="icon">🔨</span>
+          <span>构建部署</span>
+        </div>
+        <div class="nav-section-label">其他</div>
+        <div class="nav-item" onclick="openBlog()">
+          <span class="icon">🌐</span>
+          <span>查看博客</span>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <a href="#" onclick="return false;">Hexo v7 · NexT</a>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <div class="top-bar">
+        <span class="page-title" id="pageTitle"><span class="highlight">📄</span> 文章管理</span>
+        <div class="top-bar-actions" id="topBarActions"></div>
+      </div>
+
+      <div class="content-area">
+        <!-- 文章列表页面 -->
+        <div class="page-section active" id="posts-page">
+          <div class="section-header">
+            <h2>全部文章</h2>
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="搜索文章..." id="searchInput" oninput="filterPosts(this.value)" />
+            </div>
+          </div>
+          <div class="post-grid" id="postGrid"></div>
+        </div>
+
+        <!-- 编辑器页面 -->
+        <div class="page-section" id="editor-page">
+          <div class="editor-container">
+            <div class="editor-toolbar">
+              <input type="text" class="filename-input" id="editorFilename" placeholder="文件名 (如: my-post)" value="untitled-post" />
+              <span class="hint">.md</span>
+              <input type="text" class="filename-input" id="editorTitle" placeholder="文章标题" style="flex: 0.6; font-weight: 400;" value="" />
+              <button class="btn btn-success" onclick="savePost()">💾 保存</button>
+              <button class="btn btn-primary" onclick="saveAndBuild()">🚀 保存并构建</button>
+              <button class="btn btn-secondary" onclick="showNewPostModal()">✚ 新建</button>
+            </div>
+            <div id="vditor"></div>
+          </div>
+        </div>
+
+        <!-- 文件管理页面 -->
+        <div class="page-section" id="files-page">
+          <div class="section-header">
+            <h2>文件管理</h2>
+          </div>
+          <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📤</div>
+            <h3>点击或拖拽文件到此处上传</h3>
+            <p>支持图片、文档 (md/pdf/doc)、压缩包等常见格式，单文件最大 100MB</p>
+            <input type="file" id="fileInput" style="display:none" onchange="uploadFile(this)" multiple />
+          </div>
+          <div class="file-filters" id="fileFilters">
+            <button class="filter-btn active" data-filter="all" onclick="filterFiles('all', this)">全部</button>
+            <button class="filter-btn" data-filter="image" onclick="filterFiles('image', this)">图片</button>
+            <button class="filter-btn" data-filter="document" onclick="filterFiles('document', this)">文档</button>
+            <button class="filter-btn" data-filter="archive" onclick="filterFiles('archive', this)">压缩包</button>
+            <button class="filter-btn" data-filter="code" onclick="filterFiles('code', this)">代码</button>
+            <button class="filter-btn" data-filter="other" onclick="filterFiles('other', this)">其他</button>
+          </div>
+          <div class="file-grid" id="fileGrid"></div>
+        </div>
+
+        <!-- 构建部署页面 -->
+        <div class="page-section" id="build-page">
+          <div style="max-width: 800px;">
+            <div style="background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; margin-bottom: 20px;">
+              <h2 style="margin-bottom: 8px; font-size: 18px;">构建博客</h2>
+              <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">重新生成静态文件，将 Markdown 文件编译为 HTML。构建完成后重新加载博客页面即可看到最新内容。</p>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" id="buildBtn" onclick="buildBlog()">🚀 开始构建</button>
+                <button class="btn btn-outline" onclick="openBlog()">🌐 查看博客</button>
+                <button class="btn btn-outline" onclick="deployBlog()">📤 部署到 GitHub</button>
+              </div>
+            </div>
+            <div class="build-output" id="buildOutput"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/vditor/dist/index.js"></script>
+  <script>
+    // ===== 全局状态 =====
+    let posts = [];
+    let files = [];
+    let currentEditingFile = null;
+    let vditor;
+    let currentFileFilter = 'all';
+
+    // ===== 工具函数 =====
+    function toast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = message;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.3s';
+        setTimeout(() => el.remove(), 300);
+      }, 3000);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function formatDate(date) {
+      if (!date) return '未知';
+      const d = new Date(date);
+      return d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ===== 页面切换 =====
+    function switchPage(pageId, navEl) {
+      document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if (navEl) navEl.classList.add('active');
+
+      const titles = {
+        'posts-page': '<span class="highlight">📄</span> 文章管理',
+        'editor-page': '<span class="highlight">✏️</span> 写文章',
+        'files-page': '<span class="highlight">📁</span> 文件管理',
+        'build-page': '<span class="highlight">🔨</span> 构建部署'
+      };
+      document.getElementById('pageTitle').innerHTML = titles[pageId] || '📄 文章管理';
+
+      const actions = document.getElementById('topBarActions');
+      if (pageId === 'posts-page') {
+        actions.innerHTML = '<button class="btn btn-primary" onclick="showNewPostModal()">✚ <span>新建文章</span></button>';
+      } else if (pageId === 'editor-page') {
+        actions.innerHTML = '<button class="btn btn-success" onclick="savePost()">💾 <span>保存</span></button> <button class="btn btn-primary" onclick="saveAndBuild()">🚀 <span>保存并构建</span></button>';
+      } else if (pageId === 'files-page') {
+        actions.innerHTML = '<button class="btn btn-primary" onclick="document.getElementById(\'fileInput\').click()">📤 <span>上传文件</span></button>';
+      } else {
+        actions.innerHTML = '<button class="btn btn-primary" onclick="buildBlog()">🚀 <span>开始构建</span></button>';
+      }
+
+      if (pageId === 'editor-page' && !vditor) {
+        initEditor();
+      }
+      if (pageId === 'files-page') {
+        loadFiles();
+      }
+    }
+
+    function openBlog() {
+      window.open('http://localhost:4000', '_blank');
+    }
+
+    // ===== 文件上传拖拽 =====
+    document.addEventListener('DOMContentLoaded', () => {
+      const area = document.getElementById('fileUploadArea');
+      if (!area) return;
+      area.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        area.classList.add('dragover');
+      });
+      area.addEventListener('dragleave', () => {
+        area.classList.remove('dragover');
+      });
+      area.addEventListener('drop', (e) => {
+        e.preventDefault();
+        area.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          uploadFiles(e.dataTransfer.files);
+        }
+      });
+    });
+
+    // ===== 文章管理 =====
+    async function loadPosts() {
+      try {
+        const res = await fetch('/api/posts');
+        const data = await res.json();
+        if (data.success) {
+          posts = data.posts;
+          renderPosts(posts);
+          document.getElementById('postCount').textContent = posts.length;
+        }
+      } catch (err) {
+        console.error('加载文章失败:', err);
+      }
+    }
+
+    function renderPosts(postList) {
+      const grid = document.getElementById('postGrid');
+      if (!postList.length) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>还没有文章</h3>
+            <p>点击"新建文章"开始写作吧！</p>
+            <button class="btn btn-primary" onclick="showNewPostModal()">✚ 新建文章</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = postList.map(post => {
+        const title = post.title || post.filename.replace('.md', '');
+        const date = post.date ? new Date(post.date).toLocaleDateString('zh-CN') : '未知日期';
+        const tags = (post.tags || []).slice(0, 5);
+        const categories = (post.categories || []).slice(0, 2);
+
+        return `
+          <div class="post-card" onclick="editPost('${post.filename}')">
+            <div class="card-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary btn-sm" onclick="editPost('${post.filename}')" title="编辑">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="confirmDelete('${post.filename}', '${title.replace(/'/g, "\\'")}')" title="删除">🗑️</button>
+            </div>
+            <h3>${title}</h3>
+            <div class="meta">
+              <span>📅 ${date}</span>
+              ${categories.length ? '<span>📂 ' + categories.join(', ') + '</span>' : ''}
+              <span>📏 ${formatSize(post.size)}</span>
+            </div>
+            <div class="excerpt">${post.excerpt || '暂无摘要...'}</div>
+            ${tags.length ? '<div class="tags">' + tags.map(t => '<span class="tag">#' + t + '</span>').join('') + '</div>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterPosts(keyword) {
+      const kw = keyword.toLowerCase().trim();
+      if (!kw) {
+        renderPosts(posts);
+        return;
+      }
+      const filtered = posts.filter(p =>
+        (p.title || '').toLowerCase().includes(kw) ||
+        (p.filename || '').toLowerCase().includes(kw) ||
+        (p.excerpt || '').toLowerCase().includes(kw) ||
+        (p.tags || []).some(t => t.toLowerCase().includes(kw)) ||
+        (p.categories || []).some(c => c.toLowerCase().includes(kw))
+      );
+      renderPosts(filtered);
+    }
+
+    // ===== 新建文章 =====
+    function showNewPostModal() {
+      document.getElementById('newPostTitle').value = '';
+      document.getElementById('newPostTags').value = '';
+      document.getElementById('newPostCategories').value = '';
+      openModal('newPostModal');
+      setTimeout(() => document.getElementById('newPostTitle').focus(), 100);
+    }
+
+    async function createNewPost() {
+      const title = document.getElementById('newPostTitle').value.trim();
+      if (!title) {
+        toast('请输入文章标题', 'error');
+        return;
+      }
+
+      const slug = title.toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 100) || 'untitled';
+
+      const tags = document.getElementById('newPostTags').value.trim();
+      const categories = document.getElementById('newPostCategories').value.trim();
+
+      const now = new Date().toISOString().split('T')[0];
+      let frontMatter = '---\n';
+      frontMatter += 'title: ' + title + '\n';
+      frontMatter += 'date: ' + now + '\n';
+      frontMatter += 'updated: ' + now + '\n';
+      if (tags) {
+        const tagArr = tags.split(/[,，]/).map(t => t.trim()).filter(Boolean);
+        frontMatter += 'tags:\n';
+        tagArr.forEach(t => { frontMatter += '  - ' + t + '\n'; });
+      }
+      if (categories) {
+        const catArr = categories.split(/[,，]/).map(c => c.trim()).filter(Boolean);
+        frontMatter += 'categories:\n';
+        catArr.forEach(c => { frontMatter += '  - ' + c + '\n'; });
+      }
+      frontMatter += '---\n\n# ' + title + '\n\n';
+
+      const filename = slug + '.md';
+
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename, content: frontMatter })
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast('文章创建成功！', 'success');
+          closeModal('newPostModal');
+          switchPage('editor-page', document.querySelectorAll('.nav-item')[1]);
+          await loadPostIntoEditor(filename);
+          loadPosts();
+        }
+      } catch (err) {
+        toast('创建失败: ' + err.message, 'error');
+      }
+    }
+
+    // ===== 文章编辑 =====
+    async function editPost(filename) {
+      switchPage('editor-page', document.querySelectorAll('.nav-item')[1]);
+      await loadPostIntoEditor(filename);
+    }
+
+    async function loadPostIntoEditor(filename) {
+      try {
+        const res = await fetch('/api/posts/' + encodeURIComponent(filename));
+        const data = await res.json();
+        if (data.success) {
+          currentEditingFile = filename;
+          document.getElementById('editorFilename').value = filename.replace('.md', '');
+          document.getElementById('pageTitle').innerHTML = '<span class="highlight">✏️</span> 编辑: ' + filename;
+
+          const content = data.content;
+          const titleMatch = content.match(/^---\n[\s\S]*?\ntitle:\s*(.+?)\n[\s\S]*?\n---\n?/);
+          if (titleMatch) {
+            document.getElementById('editorTitle').value = titleMatch[1].replace(/['"]/g, '');
+          } else {
+            document.getElementById('editorTitle').value = filename.replace('.md', '');
+          }
+
+          if (vditor && vditorReady) {
+            vditor.setValue(content);
+          } else {
+            vditorInitialContent = content;
+          }
+        }
+      } catch (err) {
+        toast('加载文章失败', 'error');
+      }
+    }
+
+    let vditorInitialContent = '';
+    let vditorReady = false;
+
+    // ===== Vditor 编辑器初始化 =====
+    function initEditor() {
+      if (vditor) return;
+
+      vditor = new Vditor('vditor', {
+        height: '100%',
+        minHeight: 400,
+        placeholder: '开始写文章...支持 Markdown、思维导图 (mermaid)、图片粘贴...',
+        mode: 'sv',
+        cdn: '/vditor',
+        toolbar: [
+          'emoji', 'headings', 'bold', 'italic', 'strike', '|',
+          'list', 'ordered-list', 'check', 'outdent', 'indent', '|',
+          'quote', 'line', 'code', 'inline-code', 'insert-before', 'insert-after', '|',
+          'upload', 'link', 'table', '|',
+          'record', 'edit-mode', 'content-theme', 'code-theme', 'export', '|',
+          'mindmap', 'mermaid', '|',
+          'fullscreen', 'outline', 'preview'
+        ],
+        cache: { enable: false },
+        preview: {
+          markdown: {
+            toc: true,
+            mark: true,
+            footnote: true,
+            math: true,
+          }
+        },
+        upload: {
+          url: '/api/upload',
+          accept: 'image/*,.md,.pdf,.zip',
+          filename(name) {
+            return Date.now() + '-' + name.replace(/[^\w.]/g, '_');
+          },
+          success(editor, msg) {
+            const data = JSON.parse(msg);
+            if (data.success) {
+              editor.insertValue('![](' + data.url + ')');
+            }
+          }
+        },
+        after() {
+          vditorReady = true;
+          if (vditorInitialContent) {
+            vditor.setValue(vditorInitialContent);
+            vditorInitialContent = '';
+          }
+        },
+        blur(value) {
+          try {
+            localStorage.setItem('editor_draft', value);
+          } catch(e) {}
+        }
+      });
+    }
+
+    // ===== 保存文章 =====
+    async function savePost() {
+      if (!vditor) {
+        toast('编辑器尚未初始化', 'error');
+        return;
+      }
+
+      const content = vditor.getValue();
+      if (!content.trim()) {
+        toast('文章内容为空', 'error');
+        return;
+      }
+
+      let filename = document.getElementById('editorFilename').value.trim();
+      if (!filename) {
+        const title = document.getElementById('editorTitle').value.trim();
+        if (title) {
+          filename = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').substring(0, 100);
+        } else {
+          filename = 'untitled-post-' + Date.now();
+        }
+      }
+      if (!filename.endsWith('.md')) filename += '.md';
+
+      let finalContent = content;
+      const hasFrontMatter = /^---\n/.test(content);
+      const editorTitle = document.getElementById('editorTitle').value.trim();
+
+      if (!hasFrontMatter && editorTitle) {
+        finalContent = `---\ntitle: ${editorTitle}\ndate: ${new Date().toISOString().split('T')[0]}\n---\n\n${content}`;
+      } else if (hasFrontMatter && editorTitle) {
+        finalContent = content.replace(
+          /^(---\n[\s\S]*?title:)\s*.+?(\n[\s\S]*?\n---)/,
+          (match, p1, p2) => {
+            return p1 + ' ' + editorTitle + p2;
+          }
+        );
+      } else if (!hasFrontMatter && !editorTitle) {
+        finalContent = `---\ntitle: ${filename.replace('.md', '')}\ndate: ${new Date().toISOString().split('T')[0]}\n---\n\n${content}`;
+      }
+
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename, content: finalContent })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentEditingFile = data.filename;
+          document.getElementById('editorFilename').value = data.filename.replace('.md', '');
+          toast('文章已保存！', 'success');
+          loadPosts();
+          localStorage.removeItem('editor_draft');
+        } else {
+          toast('保存失败', 'error');
+        }
+      } catch (err) {
+        toast('保存失败: ' + err.message, 'error');
+      }
+    }
+
+    async function saveAndBuild() {
+      await savePost();
+      await buildBlog();
+    }
+
+    // ===== 删除文章 =====
+    let pendingDeleteFile = null;
+    let pendingDeleteContext = 'post';
+
+    function confirmDelete(filename, title) {
+      pendingDeleteFile = filename;
+      pendingDeleteContext = 'post';
+      document.getElementById('deleteMessage').textContent = `确定要删除「${title}」吗？此操作不可撤销。`;
+      openModal('deleteModal');
+      document.getElementById('confirmDeleteBtn').onclick = async () => {
+        try {
+          const res = await fetch('/api/posts/' + encodeURIComponent(pendingDeleteFile), { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            toast('文章已删除', 'info');
+            closeModal('deleteModal');
+            loadPosts();
+            pendingDeleteFile = null;
+          } else {
+            toast('删除失败', 'error');
+          }
+        } catch (err) {
+          toast('删除失败: ' + err.message, 'error');
+        }
+      };
+    }
+
+    // ===== 文件管理 =====
+    async function loadFiles() {
+      try {
+        const res = await fetch('/api/files?type=' + currentFileFilter);
+        const data = await res.json();
+        if (data.success) {
+          files = data.files;
+          renderFiles(files);
+          document.getElementById('fileCount').textContent = files.length;
+        }
+      } catch (err) {
+        console.error('加载文件失败:', err);
+      }
+    }
+
+    function getFileIcon(ext) {
+      const iconMap = {
+        '.jpg': '🖼️', '.jpeg': '🖼️', '.png': '🖼️', '.gif': '🎨',
+        '.webp': '🖼️', '.svg': '📐', '.bmp': '🖼️', '.ico': '🔖',
+        '.md': '📝', '.pdf': '📕', '.txt': '📄', '.csv': '📊',
+        '.doc': '📘', '.docx': '📘', '.xls': '📊', '.xlsx': '📊',
+        '.ppt': '📙', '.pptx': '📙',
+        '.zip': '📦', '.rar': '📦', '.7z': '📦', '.tar': '📦', '.gz': '📦',
+        '.json': '{ }', '.xml': '</>', '.yaml': '⚙️', '.yml': '⚙️',
+        '.js': '📜', '.ts': '📘', '.py': '🐍', '.java': '☕', '.css': '🎨',
+        '.html': '🌐', '.sh': '💻', '.bat': '💻',
+      };
+      return iconMap[ext] || '📄';
+    }
+
+    function renderFiles(fileList) {
+      const grid = document.getElementById('fileGrid');
+      if (!fileList.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon">📁</div>
+            <h3>暂无文件</h3>
+            <p>点击上方区域或拖拽文件到此处上传</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = fileList.map(file => {
+        const ext = file.ext || '';
+        return `
+          <div class="file-card">
+            <div class="file-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary btn-sm" onclick="copyFileUrl('${file.url}')" title="复制链接">🔗</button>
+              <button class="btn btn-danger btn-sm" onclick="confirmDeleteFile('${file.url}', '${file.filename}')" title="删除">🗑️</button>
+            </div>
+            <div class="file-icon">${getFileIcon(ext)}</div>
+            <div class="file-name">${file.filename}</div>
+            <div class="file-meta">${formatSize(file.size)} · ${formatDate(file.modified)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyFileUrl(url) {
+      navigator.clipboard.writeText(window.location.origin + url).then(() => {
+        toast('链接已复制: ' + url, 'success');
+      }).catch(() => {
+        toast('复制失败，请手动复制', 'error');
+      });
+    }
+
+    function confirmDeleteFile(url, filename) {
+      pendingDeleteFile = url;
+      pendingDeleteContext = 'file';
+      document.getElementById('deleteMessage').textContent = `确定要删除「${filename}」吗？此操作不可撤销。`;
+      openModal('deleteModal');
+      document.getElementById('confirmDeleteBtn').onclick = async () => {
+        try {
+          // url = /images/xxx.jpg or /uploads/xxx.zip
+          const parts = pendingDeleteFile.split('/');
+          const dir = parts[1]; // images or uploads
+          const fname = parts.slice(2).join('/');
+          const res = await fetch(`/api/files/${dir}/${encodeURIComponent(fname)}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            toast('文件已删除', 'info');
+            closeModal('deleteModal');
+            loadFiles();
+            pendingDeleteFile = null;
+          } else {
+            toast('删除失败', 'error');
+          }
+        } catch (err) {
+          toast('删除失败: ' + err.message, 'error');
+        }
+      };
+    }
+
+    function filterFiles(type, btnEl) {
+      currentFileFilter = type;
+      document.querySelectorAll('.file-filters .filter-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      loadFiles();
+    }
+
+    function uploadFile(input) {
+      if (input.files && input.files.length) {
+        uploadFiles(input.files);
+      }
+      input.value = '';
+    }
+
+    async function uploadFiles(fileList) {
+      for (const file of fileList) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (data.success) {
+            toast(`上传成功: ${data.filename}`, 'success');
+          } else {
+            toast(`上传失败: ${data.error || '未知错误'}`, 'error');
+          }
+        } catch (err) {
+          toast('上传失败: ' + err.message, 'error');
+        }
+      }
+      loadFiles();
+    }
+
+    // ===== 构建博客 =====
+    async function buildBlog() {
+      const btn = document.getElementById('buildBtn');
+      const output = document.getElementById('buildOutput');
+      btn.disabled = true;
+      btn.textContent = '⏳ 构建中...';
+      output.classList.add('show');
+      output.textContent = '正在构建...\n';
+
+      try {
+        const res = await fetch('/api/build', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          output.textContent = '✅ 构建成功！\n\n' + (data.output || '');
+          toast('博客构建成功！', 'success');
+        } else {
+          output.textContent = '❌ 构建失败:\n' + (data.error || '') + '\n\n' + (data.output || '');
+          toast('构建失败: ' + (data.error || '未知错误'), 'error');
+        }
+      } catch (err) {
+        output.textContent = '❌ 构建错误:\n' + err.message;
+        toast('构建错误: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 开始构建';
+      }
+    }
+
+    async function deployBlog() {
+      const output = document.getElementById('buildOutput');
+      output.classList.add('show');
+      output.textContent = '正在部署到 GitHub Pages...\n';
+
+      try {
+        const res = await fetch('/api/build', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          output.textContent = '✅ 构建成功！请在终端手动执行 hexo deploy 完成部署。\n\n' + (data.output || '');
+          toast('构建成功，请手动执行部署', 'info');
+        } else {
+          output.textContent = '❌ 构建失败:\n' + (data.error || '');
+          toast('构建失败', 'error');
+        }
+      } catch (err) {
+        output.textContent = '❌ 错误:\n' + err.message;
+        toast('部署失败', 'error');
+      }
+    }
+
+    // ===== 初始化 =====
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPosts();
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          const activePage = document.querySelector('.page-section.active');
+          if (activePage && activePage.id === 'editor-page') {
+            savePost();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

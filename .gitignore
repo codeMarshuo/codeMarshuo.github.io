@@ -1,0 +1,11 @@
+node_modules/
+public/
+.deploy_git/
+db.json
+.claude/
+.env
+.env.*
+!.env.example
+*.log
+themes/next/
+source/_drafts/
