@@ -1,44 +1,41 @@
 # Marshuo's Blog
 
-个人博客源码，使用 Hexo 与自定义 Marshuo Journal 主题。
+Java 后端学习博客，使用 Hexo 与自定义 Marshuo 主题。线上：https://codemarshuo.github.io/
 
-- 在线网站：https://codemarshuo.github.io/
-- 本分支 `source` 保存源码，`main` 保存生成的静态页面。
-- 原始项目位置：`D:\marshuoblog\myblog`。
+`source` 分支保存源码，`main` 保存生成页面。原始项目位置为 `D:\marshuoblog\myblog`；在其他本地副本编辑前，请先拉取最新 `source` 分支，避免用旧主题覆盖线上改版。
 
-## 本地预览
+## 预览与发布
 
-使用 Node.js 22 或更新的 LTS 版本，运行：
+Node.js 22 或更新的 LTS 版本。安装依赖后构建、预览：
 
 ```sh
 npm ci
+npm run clean
 npm run build
 npm run server
 ```
 
-文章位于 `source/_posts/`，支持 Markdown。主题源码位于 `themes/marshuo/`；归档、标签和分类由 Hexo 自动生成。搜索数据在构建时生成，无需令牌或第三方服务。
+发布时先将源码提交到 `source` 分支，然后运行 `npm run deploy`。`admin-server.js` 与 `admin-ui` 仅在本地使用。
 
-## 发布
+## 写入技术栏目
 
-```sh
-npm run clean
-npm run build
-npm run deploy
+文章位于 `source/_posts/`。文章开头的 `categories` 使用以下名称之一（区分大小写）：Java、Spring Boot、Redis、MySQL、JVM、JUC、Kafka、Spring Cloud、Elasticsearch。
+
+```yaml
+---
+title: 我的第一篇 Redis 笔记
+date: 2026-11-09 12:00:00
+categories:
+  - Redis
+tags:
+  - 缓存
+---
 ```
 
-部署使用 Git 凭据管理器或 SSH 认证，不要将访问令牌写入任何项目文件。每次更新后，将源码提交并推送到 `source` 分支，再部署生成页面。`admin-server.js` 与 `admin-ui` 仅供本地编辑使用，不会发布到 GitHub Pages。
+本地后台的新建文章分类框提供这九个名称。新文章脚手架默认归入 Java，请按内容修改。多项平级分类请使用 Hexo 的独立分类列表格式，避免无意建立层级分类。
 
-## 紫色山景与动画
+## 首页与待学清单
 
-首页背景由内联 SVG、CSS 网格和少量渐变构成，无背景视频、远程图片或动画库。只有流星与三颗星星持续动画，使用 transform / opacity；手机保留两颗动态星星。
+学习方向与知识点的唯一配置为 `source/_data/learning.json`。修改后重新构建即可更新首页和栏目页面。空栏目会自动生成；该栏目有文章后，由 Hexo 标准分类生成器接管，自动列出文章、更新篇数，保留待学入口。
 
-- 点击首屏右下角可暂停或播放，偏好保存在当前浏览器。
-- 页面隐藏、首屏离开视野时自动暂停；尊重系统的“减少动态效果”。
-- 搜索索引按需加载，站点资源带内容版本，更新后避免读取旧样式。
-- 修改仓库入口：`themes/marshuo/layout/index.ejs` 中的项目卡片链接。
-
-## 玻璃主题的布局与性能
-
-山景 SVG 保持 4:3 原始比例并使用 meet 显示；手机文字与山景分别分配高度，避免放大裁切。正文区有独立的阅读宽度，仓库名称与说明成组显示。
-
-玻璃模糊只在导航使用，桌面 16px、手机 10px；不对整页做实时模糊或折射。减少透明度偏好下使用实色导航，不支持 backdrop-filter 时保留可读的半透明底色。星空动画继续支持离屏暂停、后台暂停、手动暂停以及减少动态效果偏好。
+勾选进度保存在每位访客自己的浏览器 `localStorage` 中，可取消勾选；首页和栏目页共享进度，不跨设备同步，不会修改作者的公开学习状态。无外部字体、动画库或图片依赖。深浅色、搜索、移动端、键盘导航均保留。

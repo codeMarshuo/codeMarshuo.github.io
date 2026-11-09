@@ -5,7 +5,7 @@
 # Site
 title: Marshuo's Blog
 subtitle: '代码改变世界'
-description: '个人技术博客，分享编程、前端开发、全栈技术、Hexo 建站等技术文章与思考'
+description: 'Marshuo 的 Java 后端技术博客，记录 Java、Spring Boot、Redis、MySQL、JVM、JUC、Kafka、Spring Cloud 与 Elasticsearch 的学习与实践'
 keywords: 技术博客,前端开发,编程,JavaScript,Hexo,全栈,Web开发
 author: Marshuo
 language: zh-CN
@@ -67,6 +67,15 @@ index_generator:
 # Category & Tag
 default_category: uncategorized
 category_map:
+  Java: java
+  Spring Boot: spring-boot
+  Redis: redis
+  MySQL: mysql
+  JVM: jvm
+  JUC: juc
+  Kafka: kafka
+  Spring Cloud: spring-cloud
+  Elasticsearch: elasticsearch
 tag_map:
 
 # Metadata elements

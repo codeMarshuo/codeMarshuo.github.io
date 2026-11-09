@@ -1,5 +1,4 @@
 ---
-title: 分类
+title: 技术栏目
 type: categories
-comments: false
 ---

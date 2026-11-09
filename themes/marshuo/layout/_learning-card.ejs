@@ -1,0 +1,7 @@
+<article class="learn-card" data-track="<%= track.slug %>">
+  <div class="learn-top"><span class="mono"><%= String(index+1).padStart(2,'0') %> / <%= track.group %></span><span class="learn-state">待学</span></div>
+  <h3><a href="/categories/<%= track.slug %>/"><%= track.name %> <span>↗</span></a></h3>
+  <p><%= track.description %></p>
+  <div class="task-list"><% track.tasks.forEach(function(task,i){ %><label><input type="checkbox" data-task="<%= track.slug %>-<%= i %>"><span><%= task %></span></label><% }); %></div>
+  <div class="learn-bottom"><span class="track-progress">0 / <%= track.tasks.length %> 已完成</span><a href="/categories/<%= track.slug %>/">进入栏目 →</a></div>
+</article>

@@ -1,0 +1,110 @@
+[
+  {
+    "slug": "java",
+    "name": "Java",
+    "group": "语言基础",
+    "description": "夯实语言功底，写出可靠的代码。",
+    "tasks": [
+      "面向对象、异常与泛型",
+      "集合框架与常用数据结构",
+      "IO / NIO 与反射机制",
+      "Stream、Lambda 与编码实践"
+    ]
+  },
+  {
+    "slug": "spring-boot",
+    "name": "Spring Boot",
+    "group": "应用开发",
+    "description": "从自动配置到完整的后端应用。",
+    "tasks": [
+      "IoC / AOP 与 Bean 生命周期",
+      "自动配置与 Starter 原理",
+      "Web 开发、参数校验与统一异常",
+      "数据访问、测试与应用部署"
+    ]
+  },
+  {
+    "slug": "redis",
+    "name": "Redis",
+    "group": "缓存系统",
+    "description": "理解缓存，让系统更快、更稳。",
+    "tasks": [
+      "数据类型与应用场景",
+      "持久化、过期与淘汰策略",
+      "缓存穿透、击穿与雪崩",
+      "分布式锁、主从与集群"
+    ]
+  },
+  {
+    "slug": "mysql",
+    "name": "MySQL",
+    "group": "关系数据库",
+    "description": "从 SQL 到索引和事务的底层逻辑。",
+    "tasks": [
+      "SQL、表设计与查询实践",
+      "B+ 树索引与执行计划",
+      "事务隔离、锁与 MVCC",
+      "慢查询分析与性能优化"
+    ]
+  },
+  {
+    "slug": "jvm",
+    "name": "JVM",
+    "group": "运行时原理",
+    "description": "看懂 Java 程序背后的运行机制。",
+    "tasks": [
+      "运行时内存与对象模型",
+      "类加载机制与双亲委派",
+      "垃圾回收算法与收集器",
+      "性能分析、GC 日志与故障排查"
+    ]
+  },
+  {
+    "slug": "juc",
+    "name": "JUC",
+    "group": "并发编程",
+    "description": "理解线程协作与并发安全。",
+    "tasks": [
+      "线程、JMM 与 happens-before",
+      "synchronized、volatile 与 CAS",
+      "AQS、Lock 与并发容器",
+      "线程池与 CompletableFuture"
+    ]
+  },
+  {
+    "slug": "kafka",
+    "name": "Kafka",
+    "group": "消息队列",
+    "description": "用消息连接服务，理解可靠与吞吐。",
+    "tasks": [
+      "Topic、Partition 与消息模型",
+      "生产者、消费者与消费组",
+      "可靠性、幂等与事务",
+      "积压排查与性能调优"
+    ]
+  },
+  {
+    "slug": "spring-cloud",
+    "name": "Spring Cloud",
+    "group": "微服务",
+    "description": "把单体能力延伸到分布式系统。",
+    "tasks": [
+      "服务注册发现与配置管理",
+      "服务调用与负载均衡",
+      "网关、限流与熔断降级",
+      "链路追踪与微服务实践"
+    ]
+  },
+  {
+    "slug": "elasticsearch",
+    "name": "Elasticsearch",
+    "group": "搜索引擎",
+    "description": "从倒排索引到高效的全文检索。",
+    "tasks": [
+      "倒排索引、分词与 Mapping",
+      "Query DSL 与聚合分析",
+      "分片、副本与集群机制",
+      "索引设计与检索性能优化"
+    ]
+  }
+]
